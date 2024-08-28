@@ -2,11 +2,14 @@ import React, { ChangeEvent, useEffect, useState } from 'react'
 import './style.css';
 import InputBox from 'src/components/InputBox';
 
+type AuthPath = '회원가입' | '로그인';
+
 interface SnsContainerProps {
-    type: '회원가입' | '로그인';
+    type: AuthPath;
 }
 
-function SnsContainer({type}: SnsContainerProps) {
+function SnsContainer({ type }: SnsContainerProps) {
+
     return (
         <div className="sns-container">
             <div className="title">SNS {type}</div>
@@ -18,7 +21,11 @@ function SnsContainer({type}: SnsContainerProps) {
     )
 }
 
-function SignUp() {
+interface AuthComponentProps {
+    onPathChange: (path: AuthPath) => void;
+};
+
+function SignUp({ onPathChange }: AuthComponentProps) {
 
     const [name, setName] = useState<string>('');
     const [id, setId] = useState<string>('');
@@ -47,20 +54,20 @@ function SignUp() {
     const [isSend, setSend] = useState<boolean>(false);
     const [isCheckedAuthNumber, setCheckedAuthNumber] = useState<boolean>(false);
 
-    const isComplete = name && id && isCheckedId && password && passwordCheck &&isMatchedPassword && isCheckedPassword && telNumber && isSend && authNumber && isCheckedAuthNumber;
+    const isComplete = name && id && isCheckedId && password && passwordCheck && isMatchedPassword && isCheckedPassword && telNumber && isSend && authNumber && isCheckedAuthNumber;
 
     const onNameChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setName(value);
     };
-    
+
     const onIdChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setId(value);
         setCheckedId(false);
         setIdMessage('');       // 중복 확인 완료 후 아이디 수정하면 중복 확인 문구 사라지게 하기
     };
-    
+
     const onPasswordChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setPassword(value);
@@ -73,26 +80,26 @@ function SignUp() {
         setPasswordMessageError(!isMatched);
         setMatchedPassword(isMatched);
     };
-    
+
     const onPasswordCheckChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setPasswordCheck(value);
     };
-    
+
     const onTelNumberChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setTelNumber(value);
         setSend(false);
         setTelNumberMessage('');
     };
-    
+
     const onAuthNumberChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setAuthNumber(value);
         setCheckedAuthNumber(false);
         setAuthNumberMessage('');
     }
-    
+
     const onIdCheckClickHandler = () => {
         if (!id) return;        // 공백일 때는 alert 안 띄우기
 
@@ -102,14 +109,14 @@ function SignUp() {
         setIdMessageError(isDuplicated);
         setCheckedId(!isDuplicated);
     }
-    
+
     const onTelNumberSandClickHandler = () => {
         if (!telNumber) return;        // 공백일 때는 안 띄우기
 
         const pattern = /^[0-9]{11}$/;
         const isMatched = pattern.test(telNumber);
 
-        if(!isMatched) {
+        if (!isMatched) {
             setTelNumberMessage('숫자 11자 입력해주세요.');
             setTelNumberMessageError(true);
             return;
@@ -119,7 +126,7 @@ function SignUp() {
         setTelNumberMessageError(false);
         setSend(true);
     }
-    
+
     const onAuthNumberCheckClickHandler = () => {
         if (!authNumber) return;        // 공백일 때는 안 띄우기
 
@@ -130,10 +137,10 @@ function SignUp() {
         setCheckedAuthNumber(isMatched);
     }
 
-    const onSignupButtonHandler = () => {
+    const onSignUpButtonHandler = () => {
         if (!isComplete) return;
-        
-        alert('회원가입!');
+
+        onPathChange('로그인');
     };
 
     useEffect(() => {
@@ -142,7 +149,7 @@ function SignUp() {
         const isEqual = password === passwordCheck;
         const message = isEqual ? '' : '비밀번호가 일치하지 않습니다.';
         setPasswordCheckMessage(message);
-        setPasswordCheckMessageError(isEqual);
+        setPasswordCheckMessageError(!isEqual);
         setCheckedPassword(isEqual);
     }, [password, passwordCheck]);
 
@@ -167,14 +174,14 @@ function SignUp() {
             </div>
 
             <div className="button-container">
-                <div className={`button ${isComplete ? 'primary' : 'disable'} full-width`} onClick={onSignupButtonHandler}>회원가입</div>
-                <div className="link">로그인</div>
+                <div className={`button ${isComplete ? 'primary' : 'disable'} full-width`} onClick={onSignUpButtonHandler}>회원가입</div>
+                <div className="link" onClick={() => onPathChange('로그인')}>로그인</div>
             </div>
         </div>
     )
 }
 
-function SignIn() {
+function SignIn({ onPathChange }: AuthComponentProps) {
 
     const [id, setId] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -182,18 +189,29 @@ function SignIn() {
     const [message, setMessage] = useState<string>('');
 
     const onIdChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {     // 체인지이벤트 받아옴
-        const {value} = event.target;
+        const { value } = event.target;
         setId(value);
     }       // 작성 후 리턴 안 적절한 위치(예 - inputBox)에 value, onChange 작성
 
     const onPasswordChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {     // 체인지이벤트 받아옴
-        const {value} = event.target;
+        const { value } = event.target;
         setPassword(value);
     }
 
+    const onSignInButtonHandler = () => {
+        if (!id || !password) return;
+
+        if (id !=='qwer1234' || password !== 'asdf0987') {
+            setMessage('로그인 정보가 일치하지 않습니다.')
+            return;
+        }
+
+        alert('로그인 성공');
+    };
+
     useEffect(() => {
         setMessage('');
-    }, [setId, setPassword])
+    }, [id, password])
 
     return (
         <div className="auth-box">
@@ -206,22 +224,31 @@ function SignIn() {
                 <InputBox value={password} onChange={onPasswordChangeHandler} message={message} messageError type='password' label='비밀번호' placeholder='비밀번호를 입력해주세요.' />
             </div>
             <div className="button-container">
-                <div id="sign-in-button" className="button primary full-width">로그인</div>
-                <div className="link">회원가입</div>
+                <div className="button primary full-width" onClick={onSignInButtonHandler}>로그인</div>
+                <div className="link" onClick={() => onPathChange('회원가입')}>회원가입</div>
             </div>
-            <div style={{width: '64px'}} className="divider"></div>
+            <div style={{ width: '64px' }} className="divider"></div>
             <SnsContainer type='로그인' />
         </div>
     );
 }
 
 export default function Auth() {
+
+    const [path, setPath] = useState<AuthPath>('로그인');      // 초기 상태는 로그인으로 지정
+
+    const onPathChangeHandler = (path: AuthPath) => {
+        setPath(path);
+    }
+
     return (
         <div id="auth-wrapper">
             <div className="auth-image"></div>
             <div className="auth-container">
-                <SignIn />
-                {/* <SignUp /> */}
+                {path === '로그인' ?
+                    <SignIn onPathChange={onPathChangeHandler} /> :
+                    <SignUp onPathChange={onPathChangeHandler} />
+                }
             </div>
         </div>
 
