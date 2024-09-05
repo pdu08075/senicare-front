@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import './style.css';
 import { useCookies } from 'react-cookie';
+import { ACCESS_TOKEN, AUTH_ABSOLUTE_PATH, CS_PATH, HR_PATH, MM_PATH, ROOT_ABSOLUTE_PATH } from 'src/constants';
 
 // component: 로고 컴포넌트 //
 function Logo() {
@@ -28,17 +29,17 @@ function Top() {
 
     // variable: 경로 이름 //
     const path = 
-        pathname.startsWith('/cs') ? '고객 관리' :
-        pathname.startsWith('/mm') ? '고객 관리' :
-        pathname.startsWith('/hr') ? '고객 관리' : '';
+        pathname.startsWith(CS_PATH) ? '고객 관리' :
+        pathname.startsWith(MM_PATH) ? '용품 관리' :
+        pathname.startsWith(HR_PATH) ? '인사 관리' : '';
 
     // function: 네비데이터 함수 //
     const navigate = useNavigate();
 
     // event handler: 로그아웃 버튼 클릭 이벤트 처리 //
     const onLogoutButtonClickHandler = () => {
-        removeCookie('accessToken', { path: '/' });
-        navigate('/auth');
+        removeCookie(ACCESS_TOKEN, { path: ROOT_ABSOLUTE_PATH });
+        navigate(AUTH_ABSOLUTE_PATH);
     }
 
     // render: 상단 컴포넌트 //
