@@ -1,17 +1,87 @@
-import React from 'react'
-import { Outlet } from 'react-router'
+import React, { useEffect } from 'react'
+import { Outlet, useLocation, useNavigate } from 'react-router';
+import './style.css';
+import { useCookies } from 'react-cookie';
+
+// component: 로고 컴포넌트 //
+function Logo() {
+
+    // render: 로고 컴포넌트 렌더링 //
+    return (
+        <div id='layout-logo'>
+            <div className='box'>
+                <div className='title'>시니케어</div>
+                <div className='icon'></div>
+            </div>
+        </div>
+    );
+
+}
+
+// component: 상단 컴포넌트 //
+function Top() {
+
+    // state: path 상태 //
+    const {pathname} = useLocation();
+    // state: cookie 상태 //
+    const [cookies, setCookie, removeCookie] = useCookies();
+
+    // variable: 경로 이름 //
+    const path = 
+        pathname.startsWith('/cs') ? '고객 관리' :
+        pathname.startsWith('/mm') ? '고객 관리' :
+        pathname.startsWith('/hr') ? '고객 관리' : '';
+
+    // function: 네비데이터 함수 //
+    const navigate = useNavigate();
+
+    // event handler: 로그아웃 버튼 클릭 이벤트 처리 //
+    const onLogoutButtonClickHandler = () => {
+        removeCookie('accessToken', { path: '/' });
+        navigate('/auth');
+    }
+
+    // render: 상단 컴포넌트 //
+    return (
+        <div id='layout-top'>
+            <div className='path'>고객 관리</div>
+            <div className='button second' onClick={onLogoutButtonClickHandler}>로그아웃</div>
+        </div>
+    );
+
+}
+
+// component: 좌측 네비게이션 컴포넌트 //
+function SideNavigation() {
+
+    // render: 좌측 네비게이션 컴포넌트 //
+    return (
+        <div id='layout-side-navigation'></div>
+    );
+
+}
 
 // component: 메인 레이아웃 컴포넌트 //
 export default function MainLayout() {
 
+    // state: cookie 상태 //
+    const [cookies] = useCookies();
+
+    // function: 네비데이터 함수 //
+    const navigator = useNavigate();
+
+    // effect: 레이아웃 마운트 시 로그인 여부 확인 //
+    useEffect(() => {
+        if(!cookies.accessToken) navigator('/auth');        // 쿠키에 토큰이 없는 상태면 auth로만 방문 가능
+    }, []);
+
     // render: 메인 레이아웃 컴포넌트 렌더링 //
     return (
-        <div>
-            <div>로고</div>
-            <div>상단</div>
-            <div>좌측 네비게이션</div>
-            <div>주 콘텐츠</div>
+        <div id='main-layout'>
+            <Logo />
+            <Top />
+            <SideNavigation />
             <Outlet />
         </div>
-    )
+    );
 }
