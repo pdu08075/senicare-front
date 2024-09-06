@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import './style.css';
 import { useCookies } from 'react-cookie';
-import { ACCESS_TOKEN, AUTH_ABSOLUTE_PATH, CS_PATH, HR_PATH, MM_PATH, ROOT_ABSOLUTE_PATH } from 'src/constants';
+import { ACCESS_TOKEN, AUTH_ABSOLUTE_PATH, CS_DETAIL_PATH, CS_PATH, HR_PATH, MM_PATH, ROOT_ABSOLUTE_PATH } from 'src/constants';
 
 // component: 로고 컴포넌트 //
 function Logo() {
@@ -39,13 +39,13 @@ function Top() {
     // event handler: 로그아웃 버튼 클릭 이벤트 처리 //
     const onLogoutButtonClickHandler = () => {
         removeCookie(ACCESS_TOKEN, { path: ROOT_ABSOLUTE_PATH });
-        navigate(AUTH_ABSOLUTE_PATH);
+        navigate(CS_DETAIL_PATH(10));
     }
 
     // render: 상단 컴포넌트 //
     return (
         <div id='layout-top'>
-            <div className='path'>고객 관리</div>
+            <div className='path'>{path}</div>
             <div className='button second' onClick={onLogoutButtonClickHandler}>로그아웃</div>
         </div>
     );
@@ -57,7 +57,24 @@ function SideNavigation() {
 
     // render: 좌측 네비게이션 컴포넌트 //
     return (
-        <div id='layout-side-navigation'></div>
+        <div id='layout-side-navigation'>
+            <div id='layout-side-navigation'>
+                <div className='navigation'>
+                    <div className='navigation-item active'>
+                        <div className='icon cs-active-icon'></div>
+                        <div className='item-text'>고객 관리</div>
+                    </div>
+                    <div className='navigation-item'>
+                        <div className='icon mm-icon'></div>
+                        <div className='item-text'>용품 관리</div>
+                    </div>
+                    <div className='navigation-item'>
+                        <div className='icon hr-icon'></div>
+                        <div className='item-text'>인사 관리</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 
 }
@@ -73,7 +90,7 @@ export default function MainLayout() {
 
     // effect: 레이아웃 마운트 시 로그인 여부 확인 //
     useEffect(() => {
-        if(!cookies.accessToken) navigator('/auth');        // 쿠키에 토큰이 없는 상태면 auth로만 방문 가능
+        // if(!cookies.accessToken) navigator('/auth');        // 쿠키에 토큰이 없는 상태면 auth로만 방문 가능
     }, []);
 
     // render: 메인 레이아웃 컴포넌트 렌더링 //
