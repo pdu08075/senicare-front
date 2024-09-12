@@ -1,6 +1,9 @@
-import React, { ChangeEvent, useEffect, useState } from 'react'
+import React, { ChangeEvent, useEffect, useId, useState } from 'react'
 import './style.css';
 import InputBox from 'src/components/InputBox';
+import axios from 'axios';
+import { IdCheckRequest } from 'src/apis';
+import { IdCheckRequestDto } from 'src/apis/dto/request/auth';
 
 type AuthPath = '회원가입' | '로그인';
 
@@ -18,15 +21,17 @@ function SnsContainer({ type }: SnsContainerProps) {
                 <div className={`sns-button ${type === '회원가입' ? 'md ' : ''}naver`}></div>
             </div>
         </div>
-    )
+    );
 }
 
 interface AuthComponentProps {
     onPathChange: (path: AuthPath) => void;
 };
 
+// component: 회원가입 화면 컴포넌트  //
 function SignUp({ onPathChange }: AuthComponentProps) {
 
+    // state: 요양사 입력 정보 상태 //
     const [name, setName] = useState<string>('');
     const [id, setId] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -34,6 +39,7 @@ function SignUp({ onPathChange }: AuthComponentProps) {
     const [telNumber, setTelNumber] = useState<string>('');
     const [authNumber, setAuthNumber] = useState<string>('');
 
+    // state: 요양사 입력 메세지 상태 //
     const [nameMessage, setNameMessage] = useState<string>('');
     const [idMessage, setIdMessage] = useState<string>('');
     const [passwordMessage, setPasswordMessage] = useState<string>('');
@@ -41,6 +47,7 @@ function SignUp({ onPathChange }: AuthComponentProps) {
     const [telNumberMessage, setTelNumberMessage] = useState<string>('');
     const [authNumberMessage, setAuthNumberMessage] = useState<string>('');
 
+    // state: 요양사 정보 메세지 에러 상태 //
     const [nameMessageError, setNameMessageError] = useState<boolean>(false);
     const [idMessageError, setIdMessageError] = useState<boolean>(false);
     const [passwordMessageError, setPasswordMessageError] = useState<boolean>(false);
@@ -48,19 +55,23 @@ function SignUp({ onPathChange }: AuthComponentProps) {
     const [telNumberMessageError, setTelNumberMessageError] = useState<boolean>(false);
     const [authNumberMessageError, setAuthNumberMessageError] = useState<boolean>(false);
 
+    // state: 입력값 검증 상태 //
     const [isCheckedId, setCheckedId] = useState<boolean>(false);
     const [isMatchedPassword, setMatchedPassword] = useState<boolean>(false);
     const [isCheckedPassword, setCheckedPassword] = useState<boolean>(false);
     const [isSend, setSend] = useState<boolean>(false);
     const [isCheckedAuthNumber, setCheckedAuthNumber] = useState<boolean>(false);
 
+    // variable: 회원가입 가능 여부 //
     const isComplete = name && id && isCheckedId && password && passwordCheck && isMatchedPassword && isCheckedPassword && telNumber && isSend && authNumber && isCheckedAuthNumber;
 
+    // event handler: 이름 변경 이벤트 처리 //
     const onNameChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setName(value);
     };
 
+    // event handler: 아이디 변경 이벤트 처리 //
     const onIdChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setId(value);
@@ -68,6 +79,7 @@ function SignUp({ onPathChange }: AuthComponentProps) {
         setIdMessage('');       // 중복 확인 완료 후 아이디 수정하면 중복 확인 문구 사라지게 하기
     };
 
+    // event handler: 비밀번호 변경 이벤트 처리 //
     const onPasswordChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setPassword(value);
@@ -81,11 +93,13 @@ function SignUp({ onPathChange }: AuthComponentProps) {
         setMatchedPassword(isMatched);
     };
 
+    // event handler: 비밀번호 변경 확인 이벤트 처리 //
     const onPasswordCheckChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setPasswordCheck(value);
     };
 
+    //  event handler: 전화번호 변경 이벤트 처리 //
     const onTelNumberChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setTelNumber(value);
@@ -93,6 +107,7 @@ function SignUp({ onPathChange }: AuthComponentProps) {
         setTelNumberMessage('');
     };
 
+    // event handler: 인증번호 변경 이벤트 처리 //
     const onAuthNumberChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
         setAuthNumber(value);
@@ -100,16 +115,25 @@ function SignUp({ onPathChange }: AuthComponentProps) {
         setAuthNumberMessage('');
     }
 
+    // event handler: 중복 확인 버튼 클릭 이벤트 처리 //
     const onIdCheckClickHandler = () => {
         if (!id) return;        // 공백일 때는 alert 안 띄우기
+        
+        const requestBody: IdCheckRequestDto = {
+            userId: id
+        };
+        IdCheckRequest(requestBody).then((responseBody) => {
+            
+        });
 
-        const isDuplicated = id === 'qwer1234';
-        const message = isDuplicated ? '이미 사용 중인 아이디입니다.' : '사용 가능한 아이디입니다.';
-        setIdMessage(message);
-        setIdMessageError(isDuplicated);
-        setCheckedId(!isDuplicated);
-    }
+        // const isDuplicated = id === 'qwer1234';
+        // const message = isDuplicated ? '이미 사용중인 아이디입니다.' : '사용 가능한 아이디입니다.';
+        // setIdMessage(message);
+        // setIdMessageError(isDuplicated);
+        // setCheckedId(!isDuplicated);
+    };
 
+    //  event handler: 전화번호 확인 이벤트 처리 //
     const onTelNumberSandClickHandler = () => {
         if (!telNumber) return;        // 공백일 때는 안 띄우기
 
@@ -127,6 +151,7 @@ function SignUp({ onPathChange }: AuthComponentProps) {
         setSend(true);
     }
 
+    // event handler: 인증 확인 버튼 클릭 이벤트 처리 //
     const onAuthNumberCheckClickHandler = () => {
         if (!authNumber) return;        // 공백일 때는 안 띄우기
 
@@ -137,12 +162,14 @@ function SignUp({ onPathChange }: AuthComponentProps) {
         setCheckedAuthNumber(isMatched);
     }
 
+    //  event handler: 회원가입 버튼 이벤트 처리 //
     const onSignUpButtonHandler = () => {
         if (!isComplete) return;
 
         onPathChange('로그인');
     };
 
+    // effect: 비밀번호 및 비밀번호 확인 변경 시 실행할 함수 //
     useEffect(() => {
         if (!password || !passwordCheck) return;      // password가 존재하지 않으면 아래 작업을 수행하지 않고 종료
 
@@ -153,6 +180,7 @@ function SignUp({ onPathChange }: AuthComponentProps) {
         setCheckedPassword(isEqual);
     }, [password, passwordCheck]);
 
+    // render: 회원가입 화면 컴포넌트 렌더링 //
     return (
         <div style={{ gap: '16px' }} className="auth-box">
             <div className="title-box">
