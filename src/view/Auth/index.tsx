@@ -161,7 +161,7 @@ function SignUp({ onPathChange }: AuthComponentProps) {
 
     };
 
-    //  event handler: 전화번호 확인 이벤트 처리 //
+    //  event handler: 전화번호 인증 버튼 클릭 이벤트 처리 //
     const onTelNumberSandClickHandler = () => {
         if (!telNumber) return;        // 공백일 때는 안 띄우기
 
@@ -175,7 +175,7 @@ function SignUp({ onPathChange }: AuthComponentProps) {
         }
 
         const requestBody: TelAuthRequestDto = { telNumber }
-        telAuthRequest(requestBody)
+        telAuthRequest(requestBody).then(telAuthResponse);
 
         // setTelNumberMessage('인증번호가 전송되었습니다.');
         // setTelNumberMessageError(false);
