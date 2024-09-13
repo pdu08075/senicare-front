@@ -2,9 +2,13 @@ import React, { ChangeEvent, useEffect, useId, useState } from 'react'
 import './style.css';
 import InputBox from 'src/components/InputBox';
 import axios from 'axios';
-import { idCheckRequest, telAuthCheckRequest, telAuthRequest } from 'src/apis';
-import { IdCheckRequestDto, TelAuthCheckRequestDto, TelAuthRequestDto } from 'src/apis/dto/request/auth';
+import { idCheckRequest, signInRequest, signUpRequest, telAuthCheckRequest, telAuthRequest } from 'src/apis';
+import { IdCheckRequestDto, SignInRequestDto, SignUpRequestDto, TelAuthCheckRequestDto, TelAuthRequestDto } from 'src/apis/dto/request/auth';
 import { ResponseDto } from 'src/apis/dto/response';
+import { SignInResponseDto } from 'src/apis/dto/response/auth';
+import { useCookies } from 'react-cookie';
+import { ACCESS_TOKEN, CS_ABSOLUTE_PATH, ROOT_PATH } from 'src/constants';
+import { useNavigate } from 'react-router';
 
 type AuthPath = '회원가입' | '로그인';
 
@@ -103,7 +107,38 @@ function SignUp({ onPathChange }: AuthComponentProps) {
     // function: 전화번호 인증 확인 Response 처리 함수 //
     const telAuthCheckResponse = (responseBody: ResponseDto | null) => {
 
-    }
+        const message =
+        !responseBody ? "서버에 문제가 있습니다.":
+        responseBody.code === 'VF' ? "올바른 데이터가 아닙니다.":
+        responseBody.code === 'TAF' ? "인증번호가 일치하기 안습니다.":
+        responseBody.code === 'DBE' ? "서버에 문제가 있습니다.":
+        responseBody.code === 'SU' ? "인증번호가 확인되었습니다.": '';
+
+        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        setAuthNumberMessage(message);
+        setAuthNumberMessageError(!isSuccessed);
+        setCheckedAuthNumber(isSuccessed);
+        
+    };
+    
+    // function: 회원가입 Response 처리 함수 //
+    const signUpResponse = (responseBody: ResponseDto | null) => {
+
+        const message =
+        !responseBody ? "서버에 문제가 있습니다.":
+        responseBody.code === 'VF' ? "올바른 데이터가 아닙니다.":
+        responseBody.code === 'DI' ? '중복된 아이디입니다.':
+        responseBody.code === 'DT' ? '중복된 전화번호입니다.':
+        responseBody.code === 'TAF' ? "인증번호가 일치하기 안습니다.":
+        responseBody.code === 'DBE' ? "서버에 문제가 있습니다.": '';
+
+        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        if(!isSuccessed) {
+            alert(message)
+            return;
+        } 
+        onPathChange('로그인');
+    };
 
     // event handler: 이름 변경 이벤트 처리 //
     const onNameChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
@@ -179,13 +214,9 @@ function SignUp({ onPathChange }: AuthComponentProps) {
             return;
         }
 
-        const requestBody: TelAuthRequestDto = { telNumber }
+        const requestBody: TelAuthRequestDto = { telNumber };
         telAuthRequest(requestBody).then(telAuthResponse);
-
-        // setTelNumberMessage('인증번호가 전송되었습니다.');
-        // setTelNumberMessageError(false);
-        // setSend(true);
-    }
+    };
 
     // event handler: 인증 확인 버튼 클릭 이벤트 처리 //
     const onAuthNumberCheckClickHandler = () => {
@@ -195,19 +226,21 @@ function SignUp({ onPathChange }: AuthComponentProps) {
             telNumber, authNumber
         }
         telAuthCheckRequest(requestBody).then(telAuthCheckResponse);
-
-        // const isMatched = authNumber === 'Q1W2';
-        // const message = isMatched ? '인증번호가 확인되었습니다.' : '인증번호가 일치하지 않습니다.';
-        // setAuthNumberMessage(message);
-        // setAuthNumberMessageError(!isMatched);
-        // setCheckedAuthNumber(isMatched);
     }
 
-    //  event handler: 회원가입 버튼 이벤트 처리 //
+    //  event handler: 회원가입 버튼 클릭 이벤트 처리 //
     const onSignUpButtonHandler = () => {
         if (!isComplete) return;
 
-        onPathChange('로그인');
+        const requestBody: SignUpRequestDto = {
+            name,
+            userId: id,
+            password,
+            telNumber,
+            authNumber,
+            joinPath: 'home'
+        }
+        signUpRequest(requestBody).then(signUpResponse);
     };
 
     // effect: 비밀번호 및 비밀번호 확인 변경 시 실행할 함수 //
@@ -250,38 +283,73 @@ function SignUp({ onPathChange }: AuthComponentProps) {
     )
 }
 
+
+/// component: 로그인 화면 컴포넌트 //
 function SignIn({ onPathChange }: AuthComponentProps) {
 
+    // state: 쿠키 상태 //
+    const[cookies, setCookie] = useCookies();
+
+    // state: 로그인 입력 정보 상태 //
     const [id, setId] = useState<string>('');
     const [password, setPassword] = useState<string>('');
 
+    // state: 로그인 입력 메세지 상태 //
     const [message, setMessage] = useState<string>('');
 
+    // function: 네비게이터 함수 //
+    const navigator = useNavigate();
+
+    // function: 로그인 Response 처리 함수 //
+    const signInResponse = (responseBody: SignInResponseDto | ResponseDto | null) => {
+        const message = 
+        !responseBody ? '서버에 문제가 있습니다.':
+        responseBody.code === 'VF' ? '아이디와 비밀번호를 모두 입력하세요.':
+        responseBody.code === 'SF' ? '로그인 정보가 일치하지 않습니다.':
+        responseBody.code === 'TCF' ? '서버에 문제가 있습니다.':
+        responseBody.code === 'DBE' ? "서버에 문제가 있습니다.": '';
+
+        const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+        if (!isSuccessed) {
+            setMessage(message);
+            return;
+        }
+        const { accessToken, expiration } = responseBody as SignInResponseDto;        // as SignInResponseDto를 붙이지 않으면 responseBody의 타입이 두 경우가 될 수 있는데 이렇게 작성하여 타입을 강제로 하나로 지정
+        const expires = new Date(Date.now() + (expiration * 1000));
+        setCookie(ACCESS_TOKEN, accessToken, { path: ROOT_PATH, expires });
+
+        navigator(CS_ABSOLUTE_PATH);
+    }
+    
+    // event handler: 아이디 변경 이벤트 처리 //
     const onIdChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {     // 체인지이벤트 받아옴
         const { value } = event.target;
         setId(value);
     }       // 작성 후 리턴 안 적절한 위치(예 - inputBox)에 value, onChange 작성
 
+    // event handler: 비밀번호 변경 이벤트 처리 //
     const onPasswordChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {     // 체인지이벤트 받아옴
         const { value } = event.target;
         setPassword(value);
     }
 
+    // event handler: 로그인 버튼 클릭 이벤트 처리 //
     const onSignInButtonHandler = () => {
         if (!id || !password) return;
 
-        if (id !=='qwer1234' || password !== 'asdf0987') {
-            setMessage('로그인 정보가 일치하지 않습니다.')
-            return;
-        }
-
-        alert('로그인 성공');
+        const requestBody: SignInRequestDto = {
+            userId: id,
+            password
+        };
+        signInRequest(requestBody).then(signInResponse);
     };
 
+    // effect: 아이디 및 비밀번호 변경 시 실행할 함수 //
     useEffect(() => {
         setMessage('');
     }, [id, password])
 
+    // render: 로그인 화면 컴포넌트 렌더링  //
     return (
         <div className="auth-box">
             <div className="title-box">
@@ -302,14 +370,18 @@ function SignIn({ onPathChange }: AuthComponentProps) {
     );
 }
 
+// component: 인증 화면 컴포넌트 //
 export default function Auth() {
 
+    // state: 선택 화면 상태 //
     const [path, setPath] = useState<AuthPath>('로그인');      // 초기 상태는 로그인으로 지정
 
+    // event handler: 화면 변경 이벤트 처리 //
     const onPathChangeHandler = (path: AuthPath) => {
         setPath(path);
     }
 
+    // render: 인증 화면 컴포넌트 렌더링 //
     return (
         <div id="auth-wrapper">
             <div className="auth-image"></div>
