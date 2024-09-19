@@ -16,6 +16,10 @@ import MM from './view/MM';
 import HR from './view/HR';
 import HRDetail from './view/HR/Detail';
 import { useSearchParams } from 'react-router-dom';
+import { getSignInRequest } from './apis';
+import { GetSignInResponseDto } from './apis/dto/response/nurse';
+import { ResponseDto } from './apis/dto/response';
+import { useSignInUserStore } from './stores';
 
 // component: root path 컴포넌트 //
 function Index() {
@@ -71,12 +75,44 @@ function SnsSuccess() {
 // component: Senicare 컴포넌트 //
 export default function Senicare() {
 
+  // state: 로그인 유저 정보 상태 //
+  const { signInUser, setSignInUser } = useSignInUserStore();
+
   // state: cookie 상태 //
   const [cookies, setCookie, removeCookie] = useCookies();    // 잘못된 토큰은 저장해둘 수 없고, 삭제해야 되니 remove도 불러옴
+
+  //function: 네비게이터 함수 //
+  const navigator = useNavigate();
+
+  // function: get sign in Response 처리 함수 //
+  const getSignInResponse = (responseBody: GetSignInResponseDto | ResponseDto | null) => {
+
+    const message = 
+    !responseBody ? '로그인 유저 정보를 불러오는데 문제가 발생했습니다.' :
+    responseBody.code === 'NI' ? '로그인 유저 정보가 존재하지 않습니다.' :
+    responseBody.code === 'AF' ? '잘못된 접근입니다.' : 
+    responseBody.code === 'DBE' ? '로그인 유저 정보를 불러오는데 문제가 발생했습니다.' : '';
+
+    const isSuccessed = responseBody !== null && responseBody.code === 'SU';
+
+    if (!isSuccessed) {
+      alert(message);
+      removeCookie(ACCESS_TOKEN, {path: ROOT_PATH});
+      setSignInUser(null);
+      navigator(AUTH_ABSOLUTE_PATH);
+      return;
+    }
+
+    const {userId, name, telNumber} = responseBody as GetSignInResponseDto;
+    setSignInUser({ userId, name, telNumber });
+
+  };
 
   // effect: cookie의 accessToken이 변경될 떄마다 로그인 유저 정보 요청 함수 //
   useEffect(() => {
     const accessToken = cookies[ACCESS_TOKEN];
+    if (accessToken) getSignInRequest(accessToken).then(getSignInResponse);
+    else setSignInUser(null);
 
   }, [cookies[ACCESS_TOKEN]]);
   
