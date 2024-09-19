@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router';
-import { useCookies } from 'react-cookie';
+import { Cookies, useCookies } from 'react-cookie';
 
 import MainLayout from './layouts/MainLayout';
 import Auth from 'src/view/Auth';
@@ -70,6 +70,15 @@ function SnsSuccess() {
 
 // component: Senicare 컴포넌트 //
 export default function Senicare() {
+
+  // state: cookie 상태 //
+  const [cookies, setCookie, removeCookie] = useCookies();    // 잘못된 토큰은 저장해둘 수 없고, 삭제해야 되니 remove도 불러옴
+
+  // effect: cookie의 accessToken이 변경될 떄마다 로그인 유저 정보 요청 함수 //
+  useEffect(() => {
+    const accessToken = cookies[ACCESS_TOKEN];
+
+  }, [cookies[ACCESS_TOKEN]]);
   
     // render: root path 컴포넌트 렌더링 //
   return (
