@@ -27,10 +27,11 @@ body {
 }
 
 #main-wrapper {
-    padding: 24px;
-    background-color: rgba(238, 238, 238, 0.5);
     display: flex;
     justify-content: center;
+    
+    padding: 24px;
+    background-color: rgba(238, 238, 238, 0.5);
 }
 
 .message.error {
@@ -125,4 +126,22 @@ body {
 
 .sns-button.naver {
     background-image: url(/public/images/naver-button.png);
+}
+
+.icon-button {
+    width: 24px;
+    height: 24px;
+
+    background-size: 100% 100%;
+
+    cursor: pointer;
+}
+
+.icon-button.edit {
+    background-image: url(/public/images/edit-icon.png);
+}
+
+.icon-button.trash {
+    background-image: url(/public/images/trash-icon.png);
+
 }
