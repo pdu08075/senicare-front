@@ -192,6 +192,7 @@
 
 .page.active {
     color: rgba(64, 64, 64, 1);
+    font-weight: 600;
 
     cursor: default;
 }
