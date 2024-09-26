@@ -25,15 +25,17 @@ const GET_SIGN_IN_API_URL = `${NURSE_MODUEL_URL}/sign-in`;
 const TOOL_MODULE_URL = `${SENICARE_API_DOMAIN}/api/v1/tool`;
 
 const POST_TOOL_API_URL = `${TOOL_MODULE_URL}`;
-
 const GET_TOOL_LIST_API_URL = `${TOOL_MODULE_URL}`;
+const GET_TOOL_API_URL = (toolNumber: number | string) => `${TOOL_MODULE_URL}/${toolNumber}`;
+const PATCH_TOOL_API_URL = (toolNumber: number | string) => `${TOOL_MODULE_URL}/${toolNumber}`;
+const DELETE_TOOL_API_URL = (toolNumber: number | string) => `${TOOL_MODULE_URL}/${toolNumber}`;
 
 const CUSTOMER_MODULE_URL = `${SENICARE_API_DOMAIN}/api/v1/customer`;
 
 const GET_CUSTOMER_LIST_API_URL = `${CUSTOMER_MODULE_URL}`;
-const GET_TOOL_API_URL = (toolNumber: number | string) => `${TOOL_MODULE_URL}/${toolNumber}`;
-const PATCH_TOOL_API_URL = (toolNumber: number | string) => `${TOOL_MODULE_URL}/${toolNumber}`;
-const DELETE_TOOL_API_URL = (toolNumber: number | string) => `${TOOL_MODULE_URL}/${toolNumber}`;
+const DELETE_CUSTOMER_API_URL = (customerNumber: number | string) => `${CUSTOMER_MODULE_URL}/${customerNumber}`;
+
+
 
 // function: Authorization Bearer 헤더 //
 const bearerAuthorization = (accessToken: string) => ({ headers: { 'Authorization': `Bearer ${accessToken}` } })
@@ -146,4 +148,12 @@ export const getCustomerListRequest = async (accessToken: string) => {
         .catch(responseErrorHandler)
     return responseBody;
 }
+
+// function: get customer list  요청 함수 //
+export const deleteCustomerRequest = async (customerNumber: number | string, accessToken: string) => {
+    const responseBody = await axios.delete(DELETE_CUSTOMER_API_URL(customerNumber), bearerAuthorization(accessToken))
+        .then(responseDataHandler<ResponseDto>)
+        .catch(responseErrorHandler);
+    return responseBody;
+};
 
