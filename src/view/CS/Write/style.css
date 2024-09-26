@@ -61,7 +61,8 @@
 
 #cs-write-wrapper .input-box .button {
     display: flex;
-    
+    align-items: center;
+
     box-sizing: border-box;
     padding: 0 inherit;           /* 부모 속성 따라가게 함 */  
     height: 35px;
