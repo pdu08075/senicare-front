@@ -1,4 +1,4 @@
-import ResponseDto from "./response.dto";
+import ResponseDto from "../response.dto";
 
 // interface: get customer response body dto //
 export default interface GetCustomerResponseDto extends ResponseDto {
@@ -8,4 +8,6 @@ export default interface GetCustomerResponseDto extends ResponseDto {
     birth: string;
     chargerName: string;
     chargerId: string;
+    address: string;
+    location: string;
 }

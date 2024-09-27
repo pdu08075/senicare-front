@@ -1,7 +1,6 @@
-/* 
-Senicare 프로젝트의 공통 CSS
+/*
+*   Senicare 프로젝트의 공통 CSS
 */
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 @font-face {
@@ -70,6 +69,10 @@ body {
 
 .button.disable {
     background-color: var(--gray-color);
+}
+
+.button.error {
+    background-color: var(--error-color);
 }
 
 .disable:hover {
@@ -143,5 +146,4 @@ body {
 
 .icon-button.trash {
     background-image: url(/public/images/trash-icon.png);
-
 }
