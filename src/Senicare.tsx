@@ -5,7 +5,7 @@ import { Cookies, useCookies } from 'react-cookie';
 import MainLayout from './layouts/MainLayout';
 import Auth from 'src/view/Auth';
 
-import { ACCESS_TOKEN, AUTH_ABSOLUTE_PATH, AUTH_PATH, CS_ABSOLUTE_PATH, CS_DETAIL_PATH, CS_PATH, CS_UPDATE_PATH, CS_WRTIE_PATH, HR_DETAIL_PATH, HR_PATH, MM_PATH, OTHERS_PATH, ROOT_PATH, SNS_SUCCESS_PATH } from './constants';
+import { ACCESS_TOKEN, AUTH_ABSOLUTE_PATH, AUTH_PATH, CS_ABSOLUTE_PATH, CS_DETAIL_PATH, CS_PATH, CS_UPDATE_PATH, CS_WRITE_PATH, HR_DETAIL_PATH, HR_PATH, MM_PATH, OTHERS_PATH, ROOT_PATH, SNS_SUCCESS_PATH } from './constants';
 
 import './Senicare.css';
 import CS from './view/CS';
@@ -123,9 +123,9 @@ export default function Senicare() {
       <Route path={AUTH_PATH} element={<Auth />} />
       <Route path={CS_PATH} element={<MainLayout />}>
         <Route index element={<CS />} />
-        <Route path={CS_WRTIE_PATH} element={<CSWrite />} />
-        <Route path={CS_DETAIL_PATH(':customNumber')} element={<CSDetail />} />
-        <Route path={CS_UPDATE_PATH(':customNumber')} element={<CSUpdate />} />
+        <Route path={CS_WRITE_PATH} element={<CSWrite />} />
+        <Route path={CS_DETAIL_PATH(':customerNumber')} element={<CSDetail />} />
+        <Route path={CS_UPDATE_PATH(':customerNumber')} element={<CSUpdate />} />
       </Route>
       <Route path={MM_PATH} element={<MainLayout />}>
         <Route index element={<MM />} />

@@ -5,7 +5,7 @@ import Pagination from 'src/components/Pagination';
 import { Customer } from 'src/types';
 import { useSignInUserStore } from 'src/stores';
 import { useCookies } from 'react-cookie';
-import { ACCESS_TOKEN, CS_DETAIL_ABSOLUTE_PATH, CS_UPDATE_ABSOLUTE_PATH, CS_WRTIE_ABSOLUTE_PATH } from 'src/constants';
+import { ACCESS_TOKEN, CS_DETAIL_ABSOLUTE_PATH, CS_UPDATE_ABSOLUTE_PATH, CS_WRITE_ABSOLUTE_PATH } from 'src/constants';
 import { deleteCustomerRequest, getCustomerListRequest } from 'src/apis';
 import { GetCustomerListResponseDto } from 'src/apis/dto/response/customer';
 import { ResponseDto } from 'src/apis/dto/response';
@@ -145,11 +145,10 @@ export default function CS() {
     };
 
     // event handler: 등록 버튼 클릭 이벤트 처리 함수 //
-    const onPostButtonClickHandler =  () => {
-        navigator(CS_WRTIE_ABSOLUTE_PATH);
-    }
-    
-    
+    const onPostButtonClickHandler = () => {
+        navigator(CS_WRITE_ABSOLUTE_PATH);
+    };
+
     // event handler: 검색어 변경 이벤트 처리 함수 //
     const onSearchWordChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
